@@ -1,0 +1,25 @@
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+	http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+	http://www.springframework.org/schema/context
+	http://www.springframework.org/schema/context/spring-context-3.0.xsd">
+
+    <context:component-scan base-package="cloud.cirrusup.*"/>
+
+    <bean id="credentials" class="com.amazonaws.auth.BasicAWSCredentials">
+        <constructor-arg name="accessKey" value="#{systemProperties['aws.accessKey']}"/>
+        <constructor-arg name="secretKey" value="#{systemProperties['aws.secretKey']}"/>
+    </bean>
+
+    <bean id="amazonS3" class="com.amazonaws.services.s3.AmazonS3Client">
+        <constructor-arg name="awsCredentials" ref="credentials"/>
+    </bean>
+
+    <bean class="cloud.cirrusup.S3PropertySourcesPlaceholderConfigurer">
+        <constructor-arg name="amazonS3" ref="amazonS3"/>
+        <constructor-arg name="bucket" value="#{systemProperties['s3.config.bucket']}"/>
+        <constructor-arg name="fileName" value="#{systemProperties['s3.config.filename']}"/>
+    </bean>
+</beans>
